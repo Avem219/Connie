@@ -1,0 +1,18 @@
+pkg update && pkg install -y openssh python python-cryptography
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+python3 -c '
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives import serialization
+
+seed = bytes.fromhex("057ef762753553d4cb4e5eef8d0263f78dea5567d79ac1825e28148010145cc5")
+key = Ed25519PrivateKey.from_private_bytes(seed)
+
+with open("/data/data/com.termux/files/home/.ssh/id_ed25519", "wb") as f:
+    f.write(key.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.OpenSSH,
+        serialization.NoEncryption()
+    ))
+'
+chmod 600 ~/.ssh/id_ed25519
+ssh -i ~/.ssh/id_ed25519 johnk@192.168.1.68
